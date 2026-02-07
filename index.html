@@ -36,6 +36,14 @@
     border: 1px solid #444; color: #fff;
     padding: 12px; border-radius: 8px; width: 100%;
     box-sizing: border-box; margin-bottom: 8px;
+    font-size: 0.95rem;
+  }
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
   }
 
   /* 드롭다운 */
@@ -184,7 +192,7 @@
       <div class="info-item"><span class="info-label">타입</span><span id="cardType">-</span></div>
       <div class="info-item"><span class="info-label">반지</span><span id="cardRing">-</span></div>
       <div class="info-item"><span class="info-label">스킬순서</span><span id="cardSkill">-</span></div>
-      <div class="info-item" style="grid-column: span 2;"><span class="info-label">영웅/장비</span><span id="cardArmor">-</span></div>
+      <div class="info-item" style="grid-column: span 2;"><span class="info-label">장비세팅 및 특이사항</span><span id="cardArmor">-</span></div>
       <div class="info-item" style="grid-column: span 2;"><span class="info-label">최근 5경기</span><div id="recentRecord" style="font-size:1.2rem; letter-spacing:3px;">-</div></div>
     </div>
     <div style="display:flex; justify-content:space-between; margin-top:10px;">
@@ -229,9 +237,13 @@
     <div style="margin-bottom:20px;">
       <h4>공격팀 직접 추가</h4>
       <input type="text" id="atkName" placeholder="공격팀 이름">
-      <input type="text" id="atkType" placeholder="타입">
+      <select id="atkType">
+        <option value="" disabled selected>타입 선택 (필수)</option>
+        <option value="속공 따야 함">⚡ 속공 따야 함</option>
+        <option value="내줘도 됨">🛡️ 내줘도 됨</option>
+      </select>
       <input type="text" id="ringRec" placeholder="반지">
-      <textarea id="armorRec" rows="2" placeholder="특이사항"></textarea>
+      <textarea id="armorRec" rows="2" placeholder="장비세팅 및 특이사항"></textarea>
       <input type="text" id="skillOrder" placeholder="스킬 순서">
       <div style="margin-top:5px;">
         <button onclick="addAttack()" style="background:#444; color:#fff;">추가</button>
@@ -255,9 +267,13 @@
     <h3>💡 공격덱 제보</h3>
     <p style="color:#aaa; font-size:0.8rem; margin-bottom:15px;">관리자 승인 후 리스트에 등록됩니다.</p>
     <input type="text" id="sugName" placeholder="공격팀 이름 (필수)">
-    <input type="text" id="sugType" placeholder="타입 (만능형 등)">
+    <select id="sugType">
+      <option value="" disabled selected>타입 선택 (필수)</option>
+      <option value="속공 따야 함">⚡ 속공 따야 함</option>
+      <option value="내줘도 됨">🛡️ 내줘도 됨</option>
+    </select>
     <input type="text" id="sugRing" placeholder="반지">
-    <textarea id="sugArmor" rows="2" placeholder="영웅/장비/특이사항"></textarea>
+    <textarea id="sugArmor" rows="2" placeholder="장비세팅 및 특이사항"></textarea>
     <input type="text" id="sugSkill" placeholder="스킬 순서">
     <div style="display:flex; gap:10px; margin-top:10px;">
       <button onclick="submitSuggestion()" style="flex:1; background:var(--accent); color:#000;">제보하기</button>
