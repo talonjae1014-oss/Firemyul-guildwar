@@ -646,13 +646,7 @@ async function loadRecentRecord(defenseKey, attackKey){
   recordDiv.innerHTML = html || "-";
 }
 
-async function canInput(){
-  const today = new Date().toISOString().slice(0,10);
-  const snap = await get(ref(db,"logs"));
-  let cnt = 0;
-  if(snap.exists()){ Object.values(snap.val()).forEach(v=>{ if(v.nick===myNick && v.date===today) cnt++; }); }
-  return cnt < 5;
-}
+// 5판 제한 로직(canInput) 제거됨
 
 async function writeLog(result){
   if(!currentDefense || !currentAttack) return alert("⚠️ 팀 선택 오류");
@@ -667,7 +661,7 @@ async function writeLog(result){
 
 window.addWin = async () => {
   if(!currentDefense || !currentAttack) return alert("⚠️ 선택 필요");
-  if (!await canInput()) return alert("하루 최대 5회");
+  // 제한 체크 로직 삭제됨
   if (!confirm(`승리 기록?`)) return;
   const w = +document.getElementById("cardWin").textContent;
   update(ref(db, `defenseTeams/${currentDefense}/attackTeams/${currentAttack}`), { win: w + 1 });
@@ -675,7 +669,7 @@ window.addWin = async () => {
 };
 window.addLose = async () => {
   if(!currentDefense || !currentAttack) return alert("⚠️ 선택 필요");
-  if (!await canInput()) return alert("하루 최대 5회");
+  // 제한 체크 로직 삭제됨
   if (!confirm(`패배 기록?`)) return;
   const l = +document.getElementById("cardLose").textContent;
   update(ref(db, `defenseTeams/${currentDefense}/attackTeams/${currentAttack}`), { lose: l + 1 });
