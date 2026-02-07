@@ -190,8 +190,12 @@
     <div class="info-grid">
       <div class="info-item"><span class="info-label">전적</span><span id="cardWin">0</span>승 <span id="cardLose">0</span>패</div>
       <div class="info-item"><span class="info-label">타입</span><span id="cardType">-</span></div>
+      
       <div class="info-item"><span class="info-label">반지</span><span id="cardRing">-</span></div>
-      <div class="info-item"><span class="info-label">스킬순서</span><span id="cardSkill">-</span></div>
+      <div class="info-item"><span class="info-label">펫</span><span id="cardPet">-</span></div>
+      
+      <div class="info-item" style="grid-column: span 2;"><span class="info-label">스킬순서</span><span id="cardSkill">-</span></div>
+      
       <div class="info-item" style="grid-column: span 2;"><span class="info-label">장비세팅 및 특이사항</span><span id="cardArmor">-</span></div>
       <div class="info-item" style="grid-column: span 2;"><span class="info-label">최근 5경기</span><div id="recentRecord" style="font-size:1.2rem; letter-spacing:3px;">-</div></div>
     </div>
@@ -242,7 +246,12 @@
         <option value="속공 따야 함">⚡ 속공 따야 함</option>
         <option value="내줘도 됨">🛡️ 내줘도 됨</option>
       </select>
-      <input type="text" id="ringRec" placeholder="반지">
+      
+      <div style="display:flex; gap:5px;">
+        <input type="text" id="ringRec" placeholder="반지">
+        <input type="text" id="atkPet" placeholder="펫 (선택)">
+      </div>
+
       <textarea id="armorRec" rows="2" placeholder="장비세팅 및 특이사항"></textarea>
       <input type="text" id="skillOrder" placeholder="스킬 순서">
       <div style="margin-top:5px;">
@@ -272,7 +281,12 @@
       <option value="속공 따야 함">⚡ 속공 따야 함</option>
       <option value="내줘도 됨">🛡️ 내줘도 됨</option>
     </select>
-    <input type="text" id="sugRing" placeholder="반지">
+    
+    <div style="display:flex; gap:5px;">
+      <input type="text" id="sugRing" placeholder="반지">
+      <input type="text" id="sugPet" placeholder="펫">
+    </div>
+
     <textarea id="sugArmor" rows="2" placeholder="장비세팅 및 특이사항"></textarea>
     <input type="text" id="sugSkill" placeholder="스킬 순서">
     <div style="display:flex; gap:10px; margin-top:10px;">
@@ -524,6 +538,7 @@ window.submitSuggestion = () => {
     name: name,
     type: document.getElementById("sugType").value,
     ring: document.getElementById("sugRing").value,
+    pet: document.getElementById("sugPet").value, // 펫 추가
     armor: document.getElementById("sugArmor").value,
     skill: document.getElementById("sugSkill").value,
     suggester: myNick,
@@ -535,6 +550,7 @@ window.submitSuggestion = () => {
     document.getElementById("sugName").value = "";
     document.getElementById("sugType").value = "";
     document.getElementById("sugRing").value = "";
+    document.getElementById("sugPet").value = ""; // 초기화
     document.getElementById("sugArmor").value = "";
     document.getElementById("sugSkill").value = "";
   });
@@ -554,7 +570,7 @@ function renderSuggestions() {
         div.innerHTML = `
           <div style="font-weight:bold; color:#fff; margin-bottom:5px;">[${defName}] 상대로 제보됨</div>
           <div style="margin-bottom:5px;"><span style="color:var(--accent);">${data.name}</span> <small style="color:#777;">(by ${data.suggester})</small></div>
-          <div style="font-size:0.8rem; color:#aaa; margin-bottom:8px;">${data.type} / ${data.ring} / ${data.armor}</div>
+          <div style="font-size:0.8rem; color:#aaa; margin-bottom:8px;">${data.type} / ${data.ring} / ${data.pet || '-'} / ${data.armor}</div>
           <div style="display:flex; gap:5px;">
             <button class="mini-btn bg-blue" onclick="approveSuggestion('${defKey}', '${sugKey}')">승인</button>
             <button class="mini-btn bg-red" onclick="rejectSuggestion('${defKey}', '${sugKey}')">거절</button>
@@ -572,7 +588,9 @@ window.approveSuggestion = async (defKey, sugKey) => {
   if(!snap.exists()) return alert("데이터가 없습니다.");
   const data = snap.val();
   const newAttack = {
-    name: data.name, type: data.type, ring: data.ring, armor: data.armor, skill: data.skill,
+    name: data.name, type: data.type, 
+    ring: data.ring, pet: data.pet || "", // 펫 추가
+    armor: data.armor, skill: data.skill,
     win: 0, lose: 0,
     maker: data.suggester 
   };
@@ -604,6 +622,7 @@ window.selectAttack = (dk, ak) => {
     document.getElementById("cardFire").textContent = rateVal >= 70 ? "🔥" : "";
     document.getElementById("cardType").textContent = d.type || "-";
     document.getElementById("cardRing").textContent = d.ring || "-";
+    document.getElementById("cardPet").textContent = d.pet || "-"; // 펫 표시
     document.getElementById("cardArmor").innerHTML = (d.armor || "-").replace(/\n/g,"<br>");
     document.getElementById("cardSkill").textContent = d.skill || "-";
     loadRecentRecord(dk, ak);
@@ -611,6 +630,7 @@ window.selectAttack = (dk, ak) => {
     document.getElementById("atkName").value=d.name; 
     document.getElementById("atkType").value=d.type; 
     document.getElementById("ringRec").value=d.ring; 
+    document.getElementById("atkPet").value=d.pet || ""; // 펫 폼
     document.getElementById("armorRec").value=d.armor; 
     document.getElementById("skillOrder").value=d.skill;
   });
@@ -672,7 +692,9 @@ window.addAttack = ()=>{
   if(!checkPW()) return;
   set(push(ref(db,`defenseTeams/${currentDefense}/attackTeams`)),{
     name:document.getElementById("atkName").value, type:document.getElementById("atkType").value, 
-    ring:document.getElementById("ringRec").value, armor:document.getElementById("armorRec").value, 
+    ring:document.getElementById("ringRec").value, 
+    pet:document.getElementById("atkPet").value, // 펫 저장
+    armor:document.getElementById("armorRec").value, 
     skill:document.getElementById("skillOrder").value, win:0, lose:0
   });
 };
@@ -680,7 +702,9 @@ window.editAttack = ()=>{
   if(!checkPW() || !currentAttack) return;
   update(ref(db,`defenseTeams/${currentDefense}/attackTeams/${currentAttack}`),{
     name:document.getElementById("atkName").value, type:document.getElementById("atkType").value, 
-    ring:document.getElementById("ringRec").value, armor:document.getElementById("armorRec").value, 
+    ring:document.getElementById("ringRec").value, 
+    pet:document.getElementById("atkPet").value, // 펫 수정
+    armor:document.getElementById("armorRec").value, 
     skill:document.getElementById("skillOrder").value
   });
   alert("수정완료");
