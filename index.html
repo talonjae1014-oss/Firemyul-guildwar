@@ -64,6 +64,15 @@
   }
   .dropdown-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; }
   .dropdown-item:hover { background: #222; color: var(--accent); }
+  
+  /* 드롭다운 내 추가 버튼 스타일 */
+  .dropdown-add-btn {
+    text-align: center; color: var(--accent); font-weight: bold; 
+    border-top: 1px dashed #444; background: rgba(79, 172, 254, 0.05);
+  }
+  .dropdown-add-btn:hover {
+    background: rgba(79, 172, 254, 0.15);
+  }
 
   /* 공격팀 리스트 */
   #attackList {
@@ -472,28 +481,45 @@ window.addEventListener('click', (e) => {
   }
 });
 
-/* 방어팀 목록 */
+/* 방어팀 목록 (드롭다운) + 일반 유저용 추가 기능 */
 onValue(ref(db,"defenseTeams"), snap => {
   const listDiv = document.getElementById("defListDropdown");
   listDiv.innerHTML = "";
   defenseDataCache = snap.val() || {}; 
-  if(!defenseDataCache) {
-    document.getElementById("defCurrentText").textContent = "데이터 없음"; return;
+  
+  if(defenseDataCache) {
+    Object.entries(defenseDataCache).forEach(([k, v]) => {
+      const tWins = Object.values(v.attackTeams||{}).reduce((a,b)=>a+(b.win||0),0);
+      const tLose = Object.values(v.attackTeams||{}).reduce((a,b)=>a+(b.lose||0),0);
+      const rate = (tWins+tLose) ? Math.round(tWins/(tWins+tLose)*100) : 0;
+      const div = document.createElement("div");
+      div.className = "dropdown-item";
+      div.innerHTML = `<b>${v.name}</b><small>공격 성공률 ${rate}% (${tWins}승 ${tLose}패)</small>`;
+      div.onclick = () => {
+        document.getElementById("defCurrentText").innerHTML = `${v.name} <span style="font-size:0.8em; color:#888;">(${rate}%)</span>`;
+        document.getElementById("defListDropdown").style.display = "none";
+        loadAttackTeams(k);
+      };
+      listDiv.appendChild(div);
+    });
   }
-  Object.entries(defenseDataCache).forEach(([k, v]) => {
-    const tWins = Object.values(v.attackTeams||{}).reduce((a,b)=>a+(b.win||0),0);
-    const tLose = Object.values(v.attackTeams||{}).reduce((a,b)=>a+(b.lose||0),0);
-    const rate = (tWins+tLose) ? Math.round(tWins/(tWins+tLose)*100) : 0;
-    const div = document.createElement("div");
-    div.className = "dropdown-item";
-    div.innerHTML = `<b>${v.name}</b><small>공격 성공률 ${rate}% (${tWins}승 ${tLose}패)</small>`;
-    div.onclick = () => {
-      document.getElementById("defCurrentText").innerHTML = `${v.name} <span style="font-size:0.8em; color:#888;">(${rate}%)</span>`;
+
+  // --- 일반 유저용 방어팀 추가 버튼 (목록 맨 아래에 생성) ---
+  const addBtn = document.createElement("div");
+  addBtn.className = "dropdown-item dropdown-add-btn";
+  addBtn.innerHTML = "<b>＋ 새 방어팀 추가하기</b>";
+  addBtn.onclick = () => {
+    const newName = prompt("새로 추가할 방어팀 이름을 입력하세요:");
+    if(newName && newName.trim() !== "") {
+      // 즉시 DB에 추가
+      push(ref(db, "defenseTeams"), { name: newName.trim(), attackTeams: {} })
+        .then(() => alert("방어팀이 추가되었습니다."))
+        .catch((err) => alert("오류: " + err));
       document.getElementById("defListDropdown").style.display = "none";
-      loadAttackTeams(k);
-    };
-    listDiv.appendChild(div);
-  });
+    }
+  };
+  listDiv.appendChild(addBtn);
+  // -----------------------------------------------------
 });
 
 window.loadAttackTeams = (dk) => {
@@ -646,8 +672,6 @@ async function loadRecentRecord(defenseKey, attackKey){
   recordDiv.innerHTML = html || "-";
 }
 
-// 5판 제한 로직(canInput) 제거됨
-
 async function writeLog(result){
   if(!currentDefense || !currentAttack) return alert("⚠️ 팀 선택 오류");
   const snap = await get(ref(db, `defenseTeams/${currentDefense}/attackTeams/${currentAttack}`));
@@ -661,7 +685,6 @@ async function writeLog(result){
 
 window.addWin = async () => {
   if(!currentDefense || !currentAttack) return alert("⚠️ 선택 필요");
-  // 제한 체크 로직 삭제됨
   if (!confirm(`승리 기록?`)) return;
   const w = +document.getElementById("cardWin").textContent;
   update(ref(db, `defenseTeams/${currentDefense}/attackTeams/${currentAttack}`), { win: w + 1 });
@@ -669,7 +692,6 @@ window.addWin = async () => {
 };
 window.addLose = async () => {
   if(!currentDefense || !currentAttack) return alert("⚠️ 선택 필요");
-  // 제한 체크 로직 삭제됨
   if (!confirm(`패배 기록?`)) return;
   const l = +document.getElementById("cardLose").textContent;
   update(ref(db, `defenseTeams/${currentDefense}/attackTeams/${currentAttack}`), { lose: l + 1 });
