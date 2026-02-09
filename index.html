@@ -56,10 +56,11 @@
     cursor: pointer; transition: 0.3s;
   }
   .glass-box:hover { background: rgba(255, 255, 255, 0.07); border-color: rgba(255, 255, 255, 0.3); }
+  
   .dropdown-list {
     display: none; position: absolute; top: 100%; left: 0; width: 100%;
     background: #0f0f0f; border: 1px solid #333; border-radius: 12px;
-    margin-top: 8px; max-height: 350px; overflow-y: auto;
+    margin-top: 8px; max-height: 400px; overflow-y: auto; /* 높이 약간 증가 */
     box-shadow: 0 10px 40px rgba(0,0,0,0.9);
   }
   .dropdown-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; }
@@ -177,7 +178,14 @@
       <span id="defCurrentText" style="font-weight:bold;">방어팀을 선택해주세요</span>
       <span style="color:#666;">▼</span>
     </div>
-    <div id="defListDropdown" class="dropdown-list"></div>
+    
+    <div id="defListDropdown" class="dropdown-list">
+      <div style="padding:10px; border-bottom:1px solid #333; background:#0f0f0f; position:sticky; top:0; z-index:10;">
+        <input type="text" id="defSearchInput" placeholder="🔍 방어팀 검색..." style="margin:0; background:#222;" oninput="filterDefense()" onclick="event.stopPropagation()">
+      </div>
+      <div id="defRealList"></div>
+      <div id="defAddBtnArea"></div>
+    </div>
   </div>
 
   <div id="attackList"></div>
@@ -474,6 +482,11 @@ function renderUserKeys() {
 window.toggleDropdown = () => {
   const list = document.getElementById("defListDropdown");
   list.style.display = (list.style.display === "block") ? "none" : "block";
+  // 드롭다운 열 때 검색창 초기화
+  if(list.style.display === "block"){
+    document.getElementById("defSearchInput").value = "";
+    filterDefense(); // 리스트 전체 보이기
+  }
 };
 window.addEventListener('click', (e) => {
   if (!e.target.closest('.dropdown-wrapper')) {
@@ -481,17 +494,40 @@ window.addEventListener('click', (e) => {
   }
 });
 
-/* 방어팀 목록 (드롭다운) + 일반 유저용 추가 기능 */
+/* 수정됨: 방어팀 목록 필터링 함수 */
+window.filterDefense = () => {
+  const input = document.getElementById("defSearchInput");
+  const filter = input.value.toLowerCase();
+  const list = document.getElementById("defRealList");
+  const items = list.getElementsByClassName("dropdown-item");
+
+  for (let i = 0; i < items.length; i++) {
+    const txt = items[i].textContent || items[i].innerText;
+    if (txt.toLowerCase().indexOf(filter) > -1) {
+      items[i].style.display = "";
+    } else {
+      items[i].style.display = "none";
+    }
+  }
+};
+
+/* 방어팀 목록 (검색+리스트+추가버튼) */
 onValue(ref(db,"defenseTeams"), snap => {
-  const listDiv = document.getElementById("defListDropdown");
-  listDiv.innerHTML = "";
+  const realList = document.getElementById("defRealList");
+  const addBtnArea = document.getElementById("defAddBtnArea");
+  
+  realList.innerHTML = "";
+  addBtnArea.innerHTML = "";
+  
   defenseDataCache = snap.val() || {}; 
   
+  // 1. 실제 리스트 생성
   if(defenseDataCache) {
     Object.entries(defenseDataCache).forEach(([k, v]) => {
       const tWins = Object.values(v.attackTeams||{}).reduce((a,b)=>a+(b.win||0),0);
       const tLose = Object.values(v.attackTeams||{}).reduce((a,b)=>a+(b.lose||0),0);
       const rate = (tWins+tLose) ? Math.round(tWins/(tWins+tLose)*100) : 0;
+      
       const div = document.createElement("div");
       div.className = "dropdown-item";
       div.innerHTML = `<b>${v.name}</b><small>공격 성공률 ${rate}% (${tWins}승 ${tLose}패)</small>`;
@@ -500,26 +536,26 @@ onValue(ref(db,"defenseTeams"), snap => {
         document.getElementById("defListDropdown").style.display = "none";
         loadAttackTeams(k);
       };
-      listDiv.appendChild(div);
+      realList.appendChild(div);
     });
+  } else {
+    realList.innerHTML = "<div style='padding:15px; color:#555; text-align:center;'>등록된 방어팀이 없습니다</div>";
   }
 
-  // --- 일반 유저용 방어팀 추가 버튼 (목록 맨 아래에 생성) ---
+  // 2. 추가 버튼 생성 (필터 영향 X, 항상 맨 아래)
   const addBtn = document.createElement("div");
   addBtn.className = "dropdown-item dropdown-add-btn";
   addBtn.innerHTML = "<b>＋ 새 방어팀 추가하기</b>";
   addBtn.onclick = () => {
     const newName = prompt("새로 추가할 방어팀 이름을 입력하세요:");
     if(newName && newName.trim() !== "") {
-      // 즉시 DB에 추가
       push(ref(db, "defenseTeams"), { name: newName.trim(), attackTeams: {} })
         .then(() => alert("방어팀이 추가되었습니다."))
         .catch((err) => alert("오류: " + err));
       document.getElementById("defListDropdown").style.display = "none";
     }
   };
-  listDiv.appendChild(addBtn);
-  // -----------------------------------------------------
+  addBtnArea.appendChild(addBtn);
 });
 
 window.loadAttackTeams = (dk) => {
