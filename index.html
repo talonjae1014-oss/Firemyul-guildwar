@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🔥 화랑 길드전 (Official)</title>
+<title>🔥 불멸 길드전 (Official)</title>
 <style>
   /* --- [스타일] Glassmorphism & Dark UI --- */
   :root {
@@ -150,7 +150,7 @@
 <body>
 
 <div id="loginScreen" style="text-align:center; margin-top:100px;">
-  <h2 style="font-size:2rem; margin-bottom:30px;">🔥 화랑 길드전</h2>
+  <h2 style="font-size:2rem; margin-bottom:30px;">🔥 불멸 길드전</h2>
   <div style="background:#111; padding:30px; border-radius:15px; display:inline-block; border:1px solid #333; width: 80%; max-width: 300px;">
     <p style="color:#aaa; font-size:0.8rem; margin-bottom:15px;">관리자가 발급한 코드가 필요합니다.</p>
     <input type="text" id="nickInput" placeholder="닉네임" style="text-align:center;">
@@ -283,8 +283,8 @@
   </div>
 
   <footer>
-    <div style="margin-bottom:5px;">Designed & Developed by <b>화랑</b></div>
-    <div style="font-size:0.7rem; color:#444;">Copyright © 2024 Hwarang Guild. All rights reserved.</div>
+    <div style="margin-bottom:5px;">Designed & Developed by <b>불멸</b></div>
+    <div style="font-size:0.7rem; color:#444;">Copyright © 2024 Bulmyeol Guild. All rights reserved.</div>
   </footer>
 </div>
 
@@ -317,15 +317,15 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getDatabase, ref, onValue, update, push, set, get, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-// [중요] 화랑 DB 설정 적용
+// [중요] 불멸 DB 설정으로 원상복구
 const firebaseConfig = {
-  apiKey: "AIzaSyACr8bD-ZrJTwXvyiQTrxacrsQshepRbB8",
-  authDomain: "sena-hwarang.firebaseapp.com",
-  databaseURL: "https://sena-hwarang-default-rtdb.firebaseio.com",
-  projectId: "sena-hwarang",
-  storageBucket: "sena-hwarang.firebasestorage.app",
-  messagingSenderId: "374306466048",
-  appId: "1:374306466048:web:a97a7bc4c9ea886e0a6be5"
+  apiKey: "AIzaSyCR5CJ6mrEWa7MM_vZFA4stfLbmTuDTun4",
+  authDomain: "firemyul-1c54d.firebaseapp.com",
+  databaseURL: "https://firemyul-1c54d-default-rtdb.firebaseio.com",
+  projectId: "firemyul-1c54d",
+  storageBucket: "firemyul-1c54d.firebasestorage.app",
+  messagingSenderId: "1030916876773",
+  appId: "1:1030916876773:web:aa19a4f3496e8981fd270c"
 };
 
 const app = initializeApp(firebaseConfig);
