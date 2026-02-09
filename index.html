@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🔥 불멸 길드전 (Official)</title>
+<title>🔥 화랑 길드전 (Official)</title>
 <style>
   /* --- [스타일] Glassmorphism & Dark UI --- */
   :root {
@@ -60,7 +60,7 @@
   .dropdown-list {
     display: none; position: absolute; top: 100%; left: 0; width: 100%;
     background: #0f0f0f; border: 1px solid #333; border-radius: 12px;
-    margin-top: 8px; max-height: 400px; overflow-y: auto; /* 높이 약간 증가 */
+    margin-top: 8px; max-height: 400px; overflow-y: auto;
     box-shadow: 0 10px 40px rgba(0,0,0,0.9);
   }
   .dropdown-item { padding: 15px; border-bottom: 1px solid #222; cursor: pointer; }
@@ -150,7 +150,7 @@
 <body>
 
 <div id="loginScreen" style="text-align:center; margin-top:100px;">
-  <h2 style="font-size:2rem; margin-bottom:30px;">🔥 불멸 길드전</h2>
+  <h2 style="font-size:2rem; margin-bottom:30px;">🔥 화랑 길드전</h2>
   <div style="background:#111; padding:30px; border-radius:15px; display:inline-block; border:1px solid #333; width: 80%; max-width: 300px;">
     <p style="color:#aaa; font-size:0.8rem; margin-bottom:15px;">관리자가 발급한 코드가 필요합니다.</p>
     <input type="text" id="nickInput" placeholder="닉네임" style="text-align:center;">
@@ -208,7 +208,7 @@
       <div class="info-item"><span class="info-label">전적</span><span id="cardWin">0</span>승 <span id="cardLose">0</span>패</div>
       <div class="info-item"><span class="info-label">타입</span><span id="cardType">-</span></div>
       
-      <div class="info-item"><span class="info-label">반지</span><span id="cardRing">-</span></div>
+      <div class="info-item"><span class="info-label">진형</span><span id="cardRing">-</span></div>
       <div class="info-item"><span class="info-label">펫</span><span id="cardPet">-</span></div>
       
       <div class="info-item" style="grid-column: span 2;"><span class="info-label">스킬순서</span><span id="cardSkill">-</span></div>
@@ -265,7 +265,7 @@
       </select>
       
       <div style="display:flex; gap:5px;">
-        <input type="text" id="ringRec" placeholder="반지">
+        <input type="text" id="ringRec" placeholder="진형(ex.밸진 뒷열 오공 프레)">
         <input type="text" id="atkPet" placeholder="펫 (선택)">
       </div>
 
@@ -283,8 +283,8 @@
   </div>
 
   <footer>
-    <div style="margin-bottom:5px;">Designed & Developed by <b>불멸</b></div>
-    <div style="font-size:0.7rem; color:#444;">Copyright © 2024 Bulmyeol Guild. All rights reserved.</div>
+    <div style="margin-bottom:5px;">Designed & Developed by <b>화랑</b></div>
+    <div style="font-size:0.7rem; color:#444;">Copyright © 2024 Hwarang Guild. All rights reserved.</div>
   </footer>
 </div>
 
@@ -300,7 +300,7 @@
     </select>
     
     <div style="display:flex; gap:5px;">
-      <input type="text" id="sugRing" placeholder="반지">
+      <input type="text" id="sugRing" placeholder="진형(ex.밸진 뒷열 오공 프레)">
       <input type="text" id="sugPet" placeholder="펫">
     </div>
 
@@ -317,14 +317,15 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getDatabase, ref, onValue, update, push, set, get, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
+// [중요] 화랑 DB 설정 적용
 const firebaseConfig = {
-  apiKey: "AIzaSyCR5CJ6mrEWa7MM_vZFA4stfLbmTuDTun4",
-  authDomain: "firemyul-1c54d.firebaseapp.com",
-  databaseURL: "https://firemyul-1c54d-default-rtdb.firebaseio.com",
-  projectId: "firemyul-1c54d",
-  storageBucket: "firemyul-1c54d.firebasestorage.app",
-  messagingSenderId: "1030916876773",
-  appId: "1:1030916876773:web:aa19a4f3496e8981fd270c"
+  apiKey: "AIzaSyACr8bD-ZrJTwXvyiQTrxacrsQshepRbB8",
+  authDomain: "sena-hwarang.firebaseapp.com",
+  databaseURL: "https://sena-hwarang-default-rtdb.firebaseio.com",
+  projectId: "sena-hwarang",
+  storageBucket: "sena-hwarang.firebasestorage.app",
+  messagingSenderId: "374306466048",
+  appId: "1:374306466048:web:a97a7bc4c9ea886e0a6be5"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -482,10 +483,9 @@ function renderUserKeys() {
 window.toggleDropdown = () => {
   const list = document.getElementById("defListDropdown");
   list.style.display = (list.style.display === "block") ? "none" : "block";
-  // 드롭다운 열 때 검색창 초기화
   if(list.style.display === "block"){
     document.getElementById("defSearchInput").value = "";
-    filterDefense(); // 리스트 전체 보이기
+    filterDefense();
   }
 };
 window.addEventListener('click', (e) => {
@@ -494,7 +494,6 @@ window.addEventListener('click', (e) => {
   }
 });
 
-/* 수정됨: 방어팀 목록 필터링 함수 */
 window.filterDefense = () => {
   const input = document.getElementById("defSearchInput");
   const filter = input.value.toLowerCase();
@@ -521,7 +520,7 @@ onValue(ref(db,"defenseTeams"), snap => {
   
   defenseDataCache = snap.val() || {}; 
   
-  // 1. 실제 리스트 생성
+  // 1. 실제 리스트
   if(defenseDataCache) {
     Object.entries(defenseDataCache).forEach(([k, v]) => {
       const tWins = Object.values(v.attackTeams||{}).reduce((a,b)=>a+(b.win||0),0);
@@ -542,7 +541,7 @@ onValue(ref(db,"defenseTeams"), snap => {
     realList.innerHTML = "<div style='padding:15px; color:#555; text-align:center;'>등록된 방어팀이 없습니다</div>";
   }
 
-  // 2. 추가 버튼 생성 (필터 영향 X, 항상 맨 아래)
+  // 2. 추가 버튼
   const addBtn = document.createElement("div");
   addBtn.className = "dropdown-item dropdown-add-btn";
   addBtn.innerHTML = "<b>＋ 새 방어팀 추가하기</b>";
@@ -600,7 +599,7 @@ window.submitSuggestion = () => {
     name: name,
     type: document.getElementById("sugType").value,
     ring: document.getElementById("sugRing").value,
-    pet: document.getElementById("sugPet").value, // 펫 추가
+    pet: document.getElementById("sugPet").value, 
     armor: document.getElementById("sugArmor").value,
     skill: document.getElementById("sugSkill").value,
     suggester: myNick,
@@ -612,7 +611,7 @@ window.submitSuggestion = () => {
     document.getElementById("sugName").value = "";
     document.getElementById("sugType").value = "";
     document.getElementById("sugRing").value = "";
-    document.getElementById("sugPet").value = ""; // 초기화
+    document.getElementById("sugPet").value = ""; 
     document.getElementById("sugArmor").value = "";
     document.getElementById("sugSkill").value = "";
   });
@@ -651,7 +650,7 @@ window.approveSuggestion = async (defKey, sugKey) => {
   const data = snap.val();
   const newAttack = {
     name: data.name, type: data.type, 
-    ring: data.ring, pet: data.pet || "", // 펫 추가
+    ring: data.ring, pet: data.pet || "", 
     armor: data.armor, skill: data.skill,
     win: 0, lose: 0,
     maker: data.suggester 
@@ -684,15 +683,15 @@ window.selectAttack = (dk, ak) => {
     document.getElementById("cardFire").textContent = rateVal >= 70 ? "🔥" : "";
     document.getElementById("cardType").textContent = d.type || "-";
     document.getElementById("cardRing").textContent = d.ring || "-";
-    document.getElementById("cardPet").textContent = d.pet || "-"; // 펫 표시
+    document.getElementById("cardPet").textContent = d.pet || "-"; 
     document.getElementById("cardArmor").innerHTML = (d.armor || "-").replace(/\n/g,"<br>");
     document.getElementById("cardSkill").textContent = d.skill || "-";
     loadRecentRecord(dk, ak);
-    // 관리자 수정 폼
+    
     document.getElementById("atkName").value=d.name; 
     document.getElementById("atkType").value=d.type; 
     document.getElementById("ringRec").value=d.ring; 
-    document.getElementById("atkPet").value=d.pet || ""; // 펫 폼
+    document.getElementById("atkPet").value=d.pet || ""; 
     document.getElementById("armorRec").value=d.armor; 
     document.getElementById("skillOrder").value=d.skill;
   });
@@ -745,7 +744,7 @@ window.addAttack = ()=>{
   set(push(ref(db,`defenseTeams/${currentDefense}/attackTeams`)),{
     name:document.getElementById("atkName").value, type:document.getElementById("atkType").value, 
     ring:document.getElementById("ringRec").value, 
-    pet:document.getElementById("atkPet").value, // 펫 저장
+    pet:document.getElementById("atkPet").value, 
     armor:document.getElementById("armorRec").value, 
     skill:document.getElementById("skillOrder").value, win:0, lose:0
   });
@@ -755,7 +754,7 @@ window.editAttack = ()=>{
   update(ref(db,`defenseTeams/${currentDefense}/attackTeams/${currentAttack}`),{
     name:document.getElementById("atkName").value, type:document.getElementById("atkType").value, 
     ring:document.getElementById("ringRec").value, 
-    pet:document.getElementById("atkPet").value, // 펫 수정
+    pet:document.getElementById("atkPet").value, 
     armor:document.getElementById("armorRec").value, 
     skill:document.getElementById("skillOrder").value
   });
